@@ -13,6 +13,12 @@ import os
 from statistics import mode
 import matplotlib.pyplot as plt
 
+## PARTE 1.2 - ESTADÍSTICAS SOBRE CLASES DE UN DATAFRAME DE IMÁGENES.
+
+
+## CARGA DE DATOS #####
+
+
 files = glob('00*.txt') # Contiene todos los archivos que comiencen con "00" y 
                         #terminen en la extensión ".txt" ubicados en la carpeta
                         #donde se encuentra el script.
@@ -32,107 +38,131 @@ clases=[] # Almacena las primeras columnas de cada dataFrame, es decir, sus clas
 
 for i in range(len(data)):
     clases.append(data[i][0])
-    
+
+## FUNCIÓN PARA OBTENER DATOS ESTADÍSTICOS SOBRE LAS IMÁGENES ANALIZADAS##
 
 def var_clases(clases):
     """
-    Función para identificar la imagen con mayor diversidad de clases.
+    Función para identificar la imagen con mayor diversidad de clases.Además se obtiene
+    la imagen con mayor cantidad de eventos y la cantidad de clases de esa imagen.
+    Permite obtener la clase que más se repite en todas las imágenes analizadas.
+    Por último, obtiene un histograma que compara la distribución de las clases que más
+    se repiten en las imágenes analizadas.
     (Obtiene los números únicos en una lista.)
     Parameters:
     clases: Lista con las clases de la imagen.
     Returns:
     Lista con la cantidad y el tipo de clases distintas en la imagen.
+    Path de la imagen analizada.
+    Máxima cantidad de eventos en una imagen, clases en imagen con máxima cantidad de 
+    eventos,clases que más se repiten, histograma que compara la repeticiones de las clases.
+    
     """
     
     var_clases = [] # Almacena la cantidad de clases encontradas en cada dataFrame
    
     for i in clases:
          unique_n = np.unique(i) # Valores únicos de clases de cada dataFrame.
-         var_clases.append(unique_n)
-    return var_clases
+         var_clases.append(unique_n)        
+    var_img = var_clases # Clases encontradas en cada dataFrame.
 
-var_img = var_clases(clases) # Clases encontradas en cada dataFrame.
+    cant=[] # Se obtiene la mayor cantidad de clases distintas.
 
-
-cant=[] # Se obtiene la mayor cantidad de clases distintas.
-
-for i in var_img:
+    for i in var_img:
         cant_var=np.size(i)
         cant.append(cant_var)
 
-for i in cant:
-    máx_var=np.max(cant) # Mayor variedad de clases encontrada en una imagen.
+    for i in cant:
+        máx_var=np.max(cant) # Mayor variedad de clases encontrada en una imagen.
     
-
-Ruta_abs=os.path.abspath(__file__)
-path, filename = os.path.split(Ruta_abs)
-
-
-print('La mayor cantidad de clases en una imagen es de',máx_var,'clases.') 
-print('Esa imagen se encuentra en la ruta {}'.format(path)) 
-
-def var_eventos(clases):
-    
-    """
-    Función para identificar la mayor cantidad de eventos en una imagen.
-    (Obtiene los el tamaño de una lista y busca la lista de mayor tamaño.)
-    Parameters:
-    clases: Lista con las clases de la imagen.
-    Returns:
-    Lista con la cantidad de eventos y la máxima cantidad de eventos registrada.
-    """
+    Ruta_abs=os.path.abspath(__file__)
     
     var_eventos=[] # Almacena la cantidad de eventos que se producen en una imagen.
     
     for i in clases:
         cant_eventos= np.size(i) # Obtiene el tamaño de la cantidad de eventos de cada dataFrame. 
         var_eventos.append(cant_eventos) 
-    return var_eventos
-
-eventos=var_eventos(clases) # Cantidad de eventos en una imagen.
-
-for i in eventos:
-    máx_event=np.max(eventos) # Obtiene la máxima cantidad de eventos registrados en una imagen.
-
-
-"""
-Éstas líneas tenían por finalidad obtener las clases existentes en la lista donde se cumple
-que existe el máximo número de eventos. Sin embargo no funciona, calculo que por algún error 
-de sintáxis que no alcancé a corregir.
-
-
-clases_max_ev=np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array
-                                        # con máxima cantidad de eventos.
-                                        #(el elemento que contiene el índice en la tupla)                                     
-for i in clases:
-    unique_ev = np.unique(i)
-
     
-"""    
-    
-print('La mayor cantidad de eventos en una imagen es',máx_event,'eventos.')
-print('Esa imagen se encuentra en la ruta {}'.format(path))
+    eventos=var_eventos # Cantidad de eventos en una imagen.
 
+    for i in eventos:
+        máx_event=np.max(eventos) # Obtiene la máxima cantidad de eventos registrados en una imagen.
+
+    for i in eventos:
+        clases_max_ev= np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array
+                                                    # con máxima cantidad de eventos.                                                                                   
+    #for i in clases[clases_max_ev[0]]:
+    #    unique_ev = np.unique(i)
    
-repet=[] # Almacena la clase que se repite más veces en cada imagen. 
+    repet=[] # Almacena la clase que se repite más veces en cada imagen. 
 
-for i in clases:
-    repeticiones = mode(i) # Obtiene la moda de cada dataFrame.
-    repet.append(repeticiones)
+    for i in clases:
+        repeticiones = mode(i) # Obtiene la moda de cada dataFrame.
+        repet.append(repeticiones)
     
-máx_rep=mode(repet) # Obtiene la clase que más se repite en todas las imágenes.
+    máx_rep=mode(repet) # Obtiene la clase que más se repite en todas las imágenes.
+    
+    
+    clases_all=[] #Almacena todas las clases detectadas en todos los dataFrames cargados.
+
+    clases_all=np.block(var_clases) # Concatena todas las listas de clases de cada dataFrame.
+            
+## PARTE 2 - HISTOGRAMA ##
+
+    plt.hist(clases_all, bins=len(var_img),color = 'grey',ec="black") # Obtiene el histograma para cada dataFrame.
+    plt.xlabel('Clases')                                             # Por el momento es necesario introducir el 
+    plt.ylabel('Cantidad de apariciones')                            # índice del dataFrame a graficar.
+    plt.title('Distribución de aparición de clases en datos ingresados')
+    plt.show() 
+            
+   
+    return (máx_var,Ruta_abs,máx_event,clases_max_ev,máx_rep,var_clases,clases_all)
+
+mvar,ruta,mevent,mclasesev,m_rep,var_clases,tipos=var_clases(clases)
+
+print('La mayor variedad de clases en una imagen es de',mvar,'clases.') 
+print('Esa imagen se encuentra en la ruta:',ruta)
+print('La mayor cantidad de eventos en una imagen es', mevent,'eventos.')
+#print('Esa imagen tiene',cant_clases,'clases')
+print('La clase que más se repite en el total de las imágenes analizadas es la correspondiente al número', m_rep,'.')
+print('En la sección "PLOTS" se encuentra un histograma de las clases que aparecen en el dataset.')
 
 
+# PARTE 3 - FUNCIÓN PARA INTERCAMBIAR CLASES.
 
-print('La clase que más se repite en el total de las imágenes analizadas es', máx_rep)
+ 
+def swap(clases):
+    
+    """
+    Función para intercambiar clases en una imagen.
+    Parameters:
+    df2 : Lista que contiene data del archivo txt cargado.
+    clase1: Valor de clase que se quiere cambiar.
+    clase2: Valor de clase por el que se quiere cambiar.
+    Returns: Reemplazo de valores.
 
-       
-plt.hist(clases[1], bins=len(var_img),color = 'grey',ec="black") # Obtiene el histograma para cada dataFrame.
-plt.xlabel('Clases')                                             # Por el momento es necesario introducir el 
-plt.ylabel('Cantidad de apariciones')                            # índice del dataFrame a graficar.
-plt.title('Distribución de clases en una imagen')
-plt.show()                                                   
+    
+    """
+
+    dirección= input('Ingrese el path de la imagen a analizar:') #Se pide al usuario
+                                                                                          # que ingrese la ruta o dirección en
+                                                                                          # donde se encuentra la imagen
+    df2 = pd.read_csv(dirección, delimiter= ' ', 
+    index_col=None, header= None).sort_index(axis=0, 
+    level=None, ascending=True, inplace=False) # Se carga el txt correspondiente a la imagen buscada.
+    
+    clases2=df2.iloc[:,0] # Se toma la columna de las clases.
+    
+    clase1= int(input('ingrese el número correspondiente a la clase que desea cambiar:'))
+    clase2= int(input('ingrese el número correspondiente de la clase por la cual va realizar el cambio:' ))
+    
+    
+    
+    reemplazo=clases2.replace(to_replace=clase1,value=clase2) # Se realiza el reemplazo.
+    
+   
+    return(dirección,df2,clases2,clase1,clase2,reemplazo)
   
-                                                              
-  
+dirección,archivo,clases2,calse1,clase2,reemplazo=swap(clases)
 
+print('Reemplazo realizado!')
