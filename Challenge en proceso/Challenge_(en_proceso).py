@@ -174,7 +174,7 @@ def swap(clases):
     return(data2,df2,clases2,clase1,clase2,reemplazo)
 
 data2,df2,clases2,clase1,clase2,reemplazo=swap(clases)
-                                                                         # que ingrese la ruta o dirección en
+                                                                        
 print('Reemplazo realizado.')
 
 
