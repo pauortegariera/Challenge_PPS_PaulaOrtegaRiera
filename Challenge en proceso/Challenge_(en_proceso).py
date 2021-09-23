@@ -84,15 +84,16 @@ def var_clases(clases):
         var_eventos.append(cant_eventos) 
     
     eventos=var_eventos # Cantidad de eventos en una imagen.
-
+    
     for i in eventos:
         máx_event=np.max(eventos) # Obtiene la máxima cantidad de eventos registrados en una imagen.
 
     for i in eventos:
-        clases_max_ev= np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array
-                                                    # con máxima cantidad de eventos.                                                                                   
-    #for i in clases[clases_max_ev[0]]:
-    #    unique_ev = np.unique(i)
+        clases_max_ev= np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array con máxima cantidad de eventos.
+    
+    
+    for i in clases_max_ev:
+        unique_ev = np.unique(i)
    
     repet=[] # Almacena la clase que se repite más veces en cada imagen. 
 
@@ -116,9 +117,9 @@ def var_clases(clases):
     plt.show() 
             
    
-    return (máx_var,Ruta_abs,máx_event,clases_max_ev,máx_rep,var_clases,clases_all)
+    return (máx_var,Ruta_abs,máx_event,máx_rep,var_clases,clases_all)
 
-mvar,ruta,mevent,mclasesev,m_rep,var_clases,tipos=var_clases(clases)
+mvar,ruta,mevent,m_rep,var_clases,tipos=var_clases(clases)
 
 print('La mayor variedad de clases en una imagen es de',mvar,'clases.') 
 print('Esa imagen se encuentra en la ruta:',ruta)
@@ -136,33 +137,44 @@ def swap(clases):
     """
     Función para intercambiar clases en una imagen.
     Parameters:
-    df2 : Lista que contiene data del archivo txt cargado.
+    clases2 : Lista que contiene los txt cargados.
     clase1: Valor de clase que se quiere cambiar.
     clase2: Valor de clase por el que se quiere cambiar.
-    Returns: Reemplazo de valores.
+    Returns: Lista con el reemplazo de valores realizado.
 
     
     """
 
-    dirección= input('Ingrese el path de la imagen a analizar:') #Se pide al usuario
-                                                                                          # que ingrese la ruta o dirección en
-                                                                                          # donde se encuentra la imagen
-    df2 = pd.read_csv(dirección, delimiter= ' ', 
-    index_col=None, header= None).sort_index(axis=0, 
-    level=None, ascending=True, inplace=False) # Se carga el txt correspondiente a la imagen buscada.
+    direc= input('Ingrese el path del dataset a analizar:') #Se pide al usuario
     
-    clases2=df2.iloc[:,0] # Se toma la columna de las clases.
+    fileDir = direc  # Dirección del directorio
+    fileExt = r'.txt' # Extensión de los archivos deseados del directorio
+   
+    files=[_ for _ in os.listdir(fileDir) if _.endswith(fileExt)] # Buásqueda de los archivos a analizar
     
+                                              
+    data2=[] # Almacena los datos de cada dataFrame cargado.
+
+    for file in files:
+        df2 = pd.read_csv(file, delimiter= ' ', 
+        index_col=None, header= None).sort_index(axis=0, 
+        level=None, ascending=True, inplace=False) # Lee los dataFrame.
+        data2.append(df2)
+
+    clases2=[] # Almacena las primeras columnas de cada dataFrame, es decir, sus clases.
+
+    for i in range(len(data2)):
+        clases2.append(data2[i][0]) 
+         
+        
     clase1= int(input('ingrese el número correspondiente a la clase que desea cambiar:'))
     clase2= int(input('ingrese el número correspondiente de la clase por la cual va realizar el cambio:' ))
+    reemplazo=[item.replace(clase1, clase2) for item in clases2] # Se realiza el reemplazo.
     
-    
-    
-    reemplazo=clases2.replace(to_replace=clase1,value=clase2) # Se realiza el reemplazo.
-    
-   
-    return(dirección,df2,clases2,clase1,clase2,reemplazo)
-  
-dirección,archivo,clases2,calse1,clase2,reemplazo=swap(clases)
+    return(data2,df2,clases2,clase1,clase2,reemplazo)
 
-print('Reemplazo realizado!')
+data2,df2,clases2,clase1,clase2,reemplazo=swap(clases)
+                                                                         # que ingrese la ruta o dirección en
+print('Reemplazo realizado.')
+
+
