@@ -16,28 +16,33 @@ import matplotlib.pyplot as plt
 ## PARTE 1.2 - ESTADÍSTICAS SOBRE CLASES DE UN DATAFRAME DE IMÁGENES.
 
 
-## CARGA DE DATOS #####
+## CARGA DE DATOS ##
 
 
 files = glob('00*.txt') # Contiene todos los archivos que comiencen con "00" y 
                         #terminen en la extensión ".txt" ubicados en la carpeta
                         #donde se encuentra el script.
+                        
+def carga_datos(files):
+    files.sort() # Ordena los txt cargados.
 
-files.sort() # Ordena los txt cargados.
+    data=[] # Almacena los datos de cada dataFrame cargado de los archivos txt.
 
-data=[] # Almacena los datos de cada dataFrame cargado de los archivos txt.
+    for file in files:
 
-for file in files:
+        df = pd.read_csv(file, delimiter= ' ', 
+        index_col=None, header= None).sort_index(axis=0, 
+        level=None, ascending=True, inplace=False) # Lee los dataFrame.
+        data.append(df)
 
-    df = pd.read_csv(file, delimiter= ' ', 
-    index_col=None, header= None).sort_index(axis=0, 
-    level=None, ascending=True, inplace=False) # Lee los dataFrame.
-    data.append(df)
+    clases=[] # Almacena las primeras columnas de cada dataFrame, es decir, sus clases.
 
-clases=[] # Almacena las primeras columnas de cada dataFrame, es decir, sus clases.
+    for i in range(len(data)):
+        clases.append(data[i][0])
+        
+        return(data,clases)
 
-for i in range(len(data)):
-    clases.append(data[i][0])
+data,clases=carga_datos(files)
 
 ## FUNCIÓN PARA OBTENER DATOS ESTADÍSTICOS SOBRE LAS IMÁGENES ANALIZADAS##
 
@@ -89,8 +94,7 @@ def var_clases(clases):
         máx_event=np.max(eventos) # Obtiene la máxima cantidad de eventos registrados en una imagen.
 
     for i in eventos:
-        clases_max_ev= np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array con máxima cantidad de eventos.
-    
+        clases_max_ev= np.where(eventos==máx_event)[0] # Índice de la lista que contiene el array con máxima cantidad de eventos. 
     
     for i in clases_max_ev:
         unique_ev = np.unique(i)
@@ -120,14 +124,6 @@ def var_clases(clases):
     return (máx_var,Ruta_abs,máx_event,máx_rep,var_clases,clases_all)
 
 mvar,ruta,mevent,m_rep,var_clases,tipos=var_clases(clases)
-
-print('La mayor variedad de clases en una imagen es de',mvar,'clases.') 
-print('Esa imagen se encuentra en la ruta:',ruta)
-print('La mayor cantidad de eventos en una imagen es', mevent,'eventos.')
-#print('Esa imagen tiene',cant_clases,'clases')
-print('La clase que más se repite en el total de las imágenes analizadas es la correspondiente al número', m_rep,'.')
-print('En la sección "PLOTS" se encuentra un histograma de las clases que aparecen en el dataset.')
-
 
 # PARTE 3 - FUNCIÓN PARA INTERCAMBIAR CLASES.
 
@@ -175,6 +171,12 @@ def swap(clases):
 
 data2,df2,clases2,clase1,clase2,reemplazo=swap(clases)
                                                                         
-print('Reemplazo realizado.')
 
-
+if __name__ == "__main__":
+    print('La mayor variedad de clases en una imagen es de',mvar,'clases.') 
+    print('Esa imagen se encuentra en la ruta:',ruta)
+    print('La mayor cantidad de eventos en una imagen es', mevent,'eventos.')
+    #print('Esa imagen tiene',cant_clases,'clases')
+    print('La clase que más se repite en el total de las imágenes analizadas es la correspondiente al número', m_rep,'.')
+    print('En la sección "PLOTS" se encuentra un histograma de las clases que aparecen en el dataset.') 
+    print('Reemplazo realizado.')
